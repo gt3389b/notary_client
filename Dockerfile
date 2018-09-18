@@ -24,9 +24,12 @@ RUN chmod -R a+rw /go
 
 USER notary
 
+WORKDIR /home/notary/
+
 RUN export PATH=$PATH:/go/bin
-RUN alias notary='notary -s https://notaryserver:4443 -d ~/.notary'
 RUN mkdir /home/notary/.notary
+RUN echo 'alias notary="notary -d ~/.notary"' >> ~/.bashrc
+
 
 COPY ./root-ca.crt /home/notary/.notary/
 COPY ./config.json /home/notary/.notary/
