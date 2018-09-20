@@ -2,6 +2,13 @@
 	"remote_server": {
 		"url": "https://notaryserver:4443",
 		"root_ca": "root-ca.crt"
+	},
+	"trust_pinning": {
+		"certs": {
+			"docker.com/gt3389b/test": ["c7a9d2a192409360c09ecacbb297de86185b3242fb9ff553fa059766a60966ec"]
+		},
+		"disable_tofu": true
+
 	}
 }
 
