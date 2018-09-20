@@ -1,0 +1,30 @@
+#! /usr/bin/python
+import json
+import hashlib
+import securesystemslib.formats
+
+import sys
+import base64
+import cfssl
+import OpenSSL.crypto
+
+cert=sys.stdin.read()
+b64cert=base64.b64encode(cert)
+
+#certAlg = cfssl
+x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
+if 'ecdsa' in x509.get_signature_algorithm():
+    keytype="ecdsa-x509"
+else:
+    keytype="rsa-x509"
+
+
+json_data = {
+        "keytype": keytype,
+        "keyval": {
+          "private": None,
+          "public": b64cert
+    }
+}
+
+print hashlib.sha256(securesystemslib.formats.encode_canonical(json_data)).hexdigest()
