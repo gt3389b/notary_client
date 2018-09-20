@@ -16,6 +16,8 @@ RUN apt-get update && apt-get install -y --quiet \
 	vim \
 	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+RUN echo "root:Docker!" | chpasswd
+
 RUN useradd -ms /bin/bash notary \
 	&& pip install codecov \
 	&& pip install securesystemslib \
