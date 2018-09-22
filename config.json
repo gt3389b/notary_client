@@ -4,8 +4,8 @@
 		"root_ca": "root-ca.crt"
 	},
 	"trust_pinning": {
-		"certs": {
-			"docker.com/gt3389b/test": ["c7a9d2a192409360c09ecacbb297de86185b3242fb9ff553fa059766a60966ec"]
+		"ca": {
+			"docker.com": "/home/notary/.notary/trusted_certificates/cacerts.crt"
 		},
 		"disable_tofu": true
 

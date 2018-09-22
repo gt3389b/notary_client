@@ -34,15 +34,21 @@ USER notary
 WORKDIR /home/notary/
 
 RUN export PATH=$PATH:/go/bin
+RUN mkdir /home/notary/bin
+ENV PATH="/home/notary/bin:${PATH}"
+
 RUN mkdir /home/notary/.notary
 RUN mkdir /home/notary/.notary/trusted_certificates
 RUN echo 'alias notary="notary -d ~/.notary"' >> ~/.bashrc
+RUN echo 'set -o vi' >> ~/.bashrc
 
-COPY ./root-ca.crt /home/notary/.notary/
-COPY ./config.json /home/notary/.notary/
+COPY --chown=notary:notary ./root-ca.crt /home/notary/.notary/
+COPY --chown=notary:notary ./config.json /home/notary/.notary/
 #COPY ./docker.com.crt /home/notary/.notary/trusted_certificates/
-COPY ./data/*.crt /home/notary/.notary/trusted_certificates/
-COPY --chown=notary:notary ./scripts/* ./
+#COPY --chown=notary:notary ./data/*.crt /home/notary/.notary/trusted_certificates/
+COPY --chown=notary:notary ./certificates_ca/cacerts.crt /home/notary/.notary/trusted_certificates/
+COPY --chown=notary:notary ./certificates_ca ./certificates_ca
+COPY --chown=notary:notary ./scripts/* ./bin/
 
 ENV NOTARY_ROOT_PASSPHRASE weakpass
 ENV NOTARY_TARGETS_PASSPHRASE weakpass
