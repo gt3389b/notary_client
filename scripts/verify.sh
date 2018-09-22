@@ -4,7 +4,7 @@ set -x
 
 id=$1
 
-rm -rf ~/.notary/tuf/docker.com/
+rm -rf ~/.notary/tuf/docker.com
 
 #test the trust_pinning
-notary -D -v list docker.com/notary/$id
+notary list docker.com/$id
