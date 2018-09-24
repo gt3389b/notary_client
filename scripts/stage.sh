@@ -6,8 +6,9 @@ if [ "$1" != "" ]; then
    id=$1
 else
    id=$RANDOM
-   gen_repo.sh $id
 fi
+
+gen_repo.sh $id
 
 echo Generating $id repo
 
