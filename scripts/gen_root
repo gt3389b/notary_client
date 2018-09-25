@@ -82,8 +82,13 @@ openssl verify -CAfile root-ca.crt root-ca.crt
 openssl verify -CAfile root-ca.crt intermediate-ca.crt
 
 mkdir -p certificates_ca
+mkdir -p certificates_repo
 cat root-ca.crt intermediate-ca.crt > cacerts.crt
+
+openssl ecparam -genkey -name prime256v1 | openssl ec -aes256 -passout pass:"weakpass" -out "notary_root.key" &>$REDIRECT
+
 mv root-ca.key root-ca.crt intermediate-ca.key intermediate-ca.crt cacerts.crt certificates_ca/
+mv notary_root.key certificates_repo/
 
 echo
 echo "********************************************************************"
