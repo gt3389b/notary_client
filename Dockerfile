@@ -48,6 +48,7 @@ COPY --chown=notary:notary ./config.json /home/notary/.notary/
 #COPY --chown=notary:notary ./data/*.crt /home/notary/.notary/trusted_certificates/
 COPY --chown=notary:notary ./certificates_ca/cacerts.crt /home/notary/.notary/trusted_certificates/
 COPY --chown=notary:notary ./certificates_ca ./certificates_ca
+COPY --chown=notary:notary ./certificates_repo ./certificates_repo
 COPY --chown=notary:notary ./scripts/* ./bin/
 
 ENV NOTARY_ROOT_PASSPHRASE weakpass

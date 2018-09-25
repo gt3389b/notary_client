@@ -12,7 +12,8 @@ gen_repo.sh $id
 
 echo Generating $id repo
 
-notary init --rootcert certificates_repo/$id.crt --rootkey certificates_repo/$id.key docker.com/$id
+notary init --rootcert certificates_repo/$id.crt --rootkey certificates_repo/notary_root.key docker.com/$id
+
 notary add docker.com/$id v1 ~/bin/setup.sh
 
 #~/data/getcert.sh docker.com/notary/$id

@@ -30,8 +30,7 @@ commonname="CN=$org/$repo"
 #NOTE:  Leaving out O= orgname for now
 subj="/${commonname//\//\\/}"
 
-openssl ecparam -genkey -name prime256v1 | openssl ec -aes256 -passout pass:"weakpass" -out "$repo.key" &>$REDIRECT
-openssl req -new -key "$repo.key" \
+openssl req -new -key "certificates_repo/notary_root.key" \
 	-out "$repo.csr" \
 	-sha256 \
 	-passin pass:"weakpass" \
@@ -53,5 +52,5 @@ cat "certificates_ca/intermediate-ca.crt" >> "$repo.crt"
 openssl verify -CAfile certificates_ca/cacerts.crt $repo.crt
 
 mkdir -p certificates_repo
-mv $repo.key $repo.crt certificates_repo/
+mv $repo.crt certificates_repo/
 
