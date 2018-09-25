@@ -8,7 +8,7 @@ else
    id=$RANDOM
 fi
 
-gen_repo.sh $id
+gen_repo $id
 
 echo Generating $id repo
 

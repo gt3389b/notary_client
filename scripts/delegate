@@ -20,7 +20,7 @@ echo Ensuring snapshot key is on server
 notary key rotate docker.com/$id snapshot -r
 
 echo Generating delegate keys and cert
-gen_delegate.sh $targ
+gen_delegate $targ
 
 echo Creating target delegate $targ and adding file
 notary delegation add docker.com/$id "targets/$targ" certificates_repo/$targ.crt --paths="secure/secret"
