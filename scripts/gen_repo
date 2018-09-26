@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
 if [ "$1" != "" ]; then
-   repo=$1
+   GUN=$1
 else
-   echo "Need repo name"
+   echo "Need GUN"
    exit
 fi
+
+cert_name=`echo $GUN | sed 's/\//_/g'`
 
 # set to true for debugging openssl logging
 if false; then 
@@ -14,7 +16,7 @@ else
   REDIRECT=/dev/null
 fi
 
-cat > "$repo.cnf" <<EOL
+cat > "$cert_name.cnf" <<EOL
 [repo_ext]
 authorityKeyIdentifier=keyid,issuer
 basicConstraints = critical,CA:FALSE
@@ -24,33 +26,32 @@ subjectAltName = DNS:notary-signer, DNS:notarysigner, DNS:localhost, IP:127.0.0.
 subjectKeyIdentifier=hash
 EOL
 
-org="docker.com"
-commonname="CN=$org/$repo"
+commonname="CN=$GUN"
 
 #NOTE:  Leaving out O= orgname for now
 subj="/${commonname//\//\\/}"
 
 openssl req -new -key "certificates_repo/notary_root.key" \
-	-out "$repo.csr" \
+	-out "$cert_name.csr" \
 	-sha256 \
 	-passin pass:"weakpass" \
         -subj "$subj"
 
-openssl x509 -req -days 750 -in "$repo.csr" -sha256 \
+openssl x509 -req -days 750 -in "$cert_name.csr" -sha256 \
         -CA "certificates_ca/intermediate-ca.crt" \
 	-CAkey "certificates_ca/intermediate-ca.key"  \
 	-CAcreateserial \
-        -out "$repo.crt" \
-	-extfile "$repo.cnf" \
+        -out "$cert_name.crt" \
+	-extfile "$cert_name.cnf" \
 	-extensions repo_ext
 
-rm "$repo.cnf" "$repo.csr"
+rm "$cert_name.cnf" "$cert_name.csr"
 
 # append the intermediate cert to this one to make it a proper bundle
-cat "certificates_ca/intermediate-ca.crt" >> "$repo.crt"
+cat "certificates_ca/intermediate-ca.crt" >> "$cert_name.crt"
 
-openssl verify -CAfile certificates_ca/cacerts.crt $repo.crt
+openssl verify -CAfile certificates_ca/cacerts.crt $cert_name.crt
 
 mkdir -p certificates_repo
-mv $repo.crt certificates_repo/
+mv $cert_name.crt certificates_repo/
 
