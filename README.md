@@ -13,9 +13,14 @@ docker exec -it <container-id> /bin/bash
 
 # Stage repo
 
-## Create a random repo, create cert/key, add content, publish, and verify
+## Create a random repo, create cert, add content, publish, and verify
 ```
-stage.sh
+stage
+```
+
+## Create a repo by name, create cert, add content, publish, and verify
+```
+stage docker.com/456
 ```
 
 ## Verfiy a published repo
