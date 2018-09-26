@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y --quiet \
 	python-setuptools \
 	jq \
 	tree \
+   liblz4-tool \
 	vim \
 	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
