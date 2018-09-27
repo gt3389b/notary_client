@@ -1,0 +1,69 @@
+#! /bin/bash
+
+arch=`dpkg --print-architecture`
+echo "Arch:" $arch
+
+echo "Getting sources..."
+while read p; do
+	#echo "$p"
+        url=`echo $p | cut -d " " -f 2`
+        rest=`echo $p | cut -d " " -f 3- | sed 's/ /\//g'`  
+	base=`[[ "$url" =~ ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))? ]] && echo "${BASH_REMATCH[4]}${BASH_REMATCH[5]}"`
+	gun=$base/dists/$rest
+	echo "Source:" $gun
+
+    pfile=$gun/binary-$arch/Packages.gz
+    echo "pfile:" $pfile
+
+    [ -e Packages.gz ] && rm Packages.gz
+    wget $pfile
+    [ -e Packages ] && rm Packages
+
+    echo "Decompressing..."
+    gzip -d Packages.gz
+
+    stage $gun
+    notary reset $gun --all
+    rm -f url.list
+
+    echo "Processing..."$gun
+    buf=""
+    state=0
+    while IFS= read -r line; do
+        if [[ $line == "" ]] ; then
+            state=$((var + 1))
+            if [[ "$state" == 1 ]] ; then
+                json=`echo -e $buf | jq -sR '[ split("\n\n";"n")[] | [ capture("(?<key>[^:\n]+): *(?<value>[^\n]+)";"g") | .key |= (. | ascii_downcase) ] | from_entries | select(length > 0)]' | jq .[0]`
+
+# PASS THIS TO PROCESSING
+                #echo $json
+		_jq() {
+		   echo ${json} | jq -r ${1}
+		}
+
+		#echo deb.debian.org/debian/$(_jq '.filename') 
+		#echo http://deb.debian.org/debian/$(_jq '.filename') 
+		filepath=$(_jq '.filename')
+		filename=`echo $filepath | rev | cut -d "/" -f 1 | rev`
+		url=http://$base/$filepath
+		#echo $gun
+		echo $url
+		if [ $(_jq '.size') -lt 1000000 ]; then
+			#wget -q -P tmp/ $url
+			#notary add $gun $filepath ${PWD}/tmp/$filename
+			#rm tmp/$filename
+			echo $url >> url.list
+		fi
+                
+                state=0
+                buf=""
+            fi
+        else
+            buf=${buf}${line}'\n'
+        fi
+    done < "Packages"
+
+    echo "Downloading"
+    cat url.list | parallel -j 8 wget -P tmp/
+
+done </etc/apt/sources.list
