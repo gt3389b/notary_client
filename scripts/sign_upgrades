@@ -37,23 +37,23 @@ while read p; do
 
 # PASS THIS TO PROCESSING
                 #echo $json
-		_jq() {
-		   echo ${json} | jq -r ${1}
-		}
+               _jq() {
+                  echo ${json} | jq -r ${1}
+               }
 
-		#echo deb.debian.org/debian/$(_jq '.filename') 
-		#echo http://deb.debian.org/debian/$(_jq '.filename') 
-		filepath=$(_jq '.filename')
-		filename=`echo $filepath | rev | cut -d "/" -f 1 | rev`
-		url=http://$base/$filepath
-		#echo $gun
-		echo $url
-		if [ $(_jq '.size') -lt 1000000 ]; then
-			#wget -q -P tmp/ $url
-			#notary add $gun $filepath ${PWD}/tmp/$filename
-			#rm tmp/$filename
-			echo $url >> url.list
-		fi
+               #echo deb.debian.org/debian/$(_jq '.filename') 
+               #echo http://deb.debian.org/debian/$(_jq '.filename') 
+               filepath=$(_jq '.filename')
+               filename=`echo $filepath | rev | cut -d "/" -f 1 | rev`
+               url=http://$base/$filepath
+               #echo $gun
+               echo $url
+               if [ $(_jq '.size') -lt 1000000 ]; then
+                  #wget -q -P tmp/ $url
+                  #notary add $gun $filepath ${PWD}/tmp/$filename
+                  #rm tmp/$filename
+                  echo $url >> url.list
+               fi
                 
                 state=0
                 buf=""
@@ -65,5 +65,16 @@ while read p; do
 
     echo "Downloading"
     cat url.list | parallel -j 8 wget -P tmp/
+
+    echo "Add file digest to notary"
+    while read p; do
+       echo "$p"
+       filepath=`[[ "$p" =~ ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))? ]] && echo "${BASH_REMATCH[5]}" | cut -d "/" -f 3-`
+       filename=`[[ "$p" =~ ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))? ]] && echo "${BASH_REMATCH[5]}" | rev | cut -d "/" -f 1 | rev`
+       #echo $filepath
+       notary add $gun $filepath ${PWD}/tmp/$filename
+       rm tmp/$filename
+    done <url.list
+
 
 done </etc/apt/sources.list

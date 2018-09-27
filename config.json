@@ -5,7 +5,9 @@
 	},
 	"trust_pinning": {
 		"ca": {
-			"docker.com": "/home/notary/.notary/trusted_certificates/cacerts.crt"
+			"docker.com": "/home/notary/.notary/trusted_certificates/cacerts.crt",
+			"security.debian.org": "/home/notary/.notary/trusted_certificates/cacerts.crt",
+			"deb.debian.org": "/home/notary/.notary/trusted_certificates/cacerts.crt"
 		},
 		"disable_tofu": true
 
